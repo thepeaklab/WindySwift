@@ -7,7 +7,7 @@ let package = Package(
     name: "WindySwift",
     platforms: [
         .macOS(.v10_10),
-        .iOS(.v8)
+        .iOS(.v9)
     ],
     products: [
         .library(name: "WindySwift", targets: ["WindySwift"]),
