@@ -33,6 +33,59 @@ public struct WindyInitOptions: Codable {
 }
 
 
+internal struct WindyCoordinates: Codable {
+
+    let lat: Double
+    let lng: Double
+
+}
+
+
+internal struct WindyEventContent: Codable {
+
+    let name: EventName
+    let options: Options
+
+    enum EventName: String, Codable {
+
+        case initialize
+        case zoomstart
+        case zoomend
+        case movestart
+        case moveend
+        case zoom
+        case move
+
+    }
+
+    struct Options: Codable {
+
+        let bounds: Bounds
+
+        struct Bounds: Codable {
+
+            let northEast: Coordinates
+            let southWest: Coordinates
+
+            struct Coordinates: Codable {
+
+                let lat: Double
+                let lng: Double
+
+            }
+
+            enum CodingKeys: String, CodingKey {
+                case northEast = "_northEast"
+                case southWest = "_southWest"
+            }
+
+        }
+
+    }
+
+}
+
+
 internal struct WindyHTML {
 
     static func indexHTML(options: WindyInitOptions) -> String {
@@ -99,6 +152,10 @@ internal struct WindyHTML {
                                     bounds: map.getBounds()
                                 });
                             });
+                        });
+
+                        sendNativeMessage('initialize', {
+                            bounds: map.getBounds()
                         });
                     });
                 </script>

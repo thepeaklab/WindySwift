@@ -28,6 +28,12 @@ public class WindyMapView: UIView {
         }
     }
 
+    public private(set) var isZooming: Bool = false
+
+    public private(set) var isMoving: Bool = false
+
+    @IBOutlet public weak var delegate: WindyMapViewDelegate?
+
     // MARK: - Init
 
     public override init(frame: CGRect) {
@@ -76,9 +82,6 @@ public class WindyMapView: UIView {
         try? htmlData?.write(to: windyIndexURL)
         webView.loadFileURL(windyIndexURL, allowingReadAccessTo: windyIndexURL)
     }
-//        setTimeout(() => {
-//            alert("foo");
-//        }, 1500);
 
     private func updateWindyLogoVisibility() {
         guard didFinishInitialNavigation else { return }
@@ -89,6 +92,13 @@ public class WindyMapView: UIView {
         bodyElement.classList.\(addOrRemove)("windy-logo-invisible");
         """
         webView.evaluateJavaScript(javascript)
+    }
+
+    private func decodedJavaScriptObject<T: Codable>(any: Any?) -> T? {
+        guard let bodyDict = any as? NSDictionary else { return nil }
+        guard let bodyData = try? JSONSerialization.data(withJSONObject: bodyDict, options: []) else { return nil }
+        guard let javaScriptObject = try? JSONDecoder().decode(T.self, from: bodyData) else { return nil }
+        return javaScriptObject
     }
 
 }
@@ -158,6 +168,21 @@ extension WindyMapView {
         webView.evaluateJavaScript(javascript)
     }
 
+    public func getCenter(closure: @escaping (CLLocationCoordinate2D?) -> Void) {
+        let javascript = """
+        globalMap.getCenter();
+        """
+
+        webView.evaluateJavaScript(javascript) { (result, error) in
+            guard let windyCoordinate: WindyCoordinates = self.decodedJavaScriptObject(any: result) else {
+                closure(nil)
+                return
+            }
+            let cordinate = CLLocationCoordinate2D(latitude: windyCoordinate.lat, longitude: windyCoordinate.lng)
+            closure(cordinate)
+        }
+    }
+
 }
 
 extension WindyMapView {
@@ -183,8 +208,30 @@ extension WindyMapView: WKNavigationDelegate {
 
 extension WindyMapView: WKScriptMessageHandler {
 
-    public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        print("did receive message: \(message.body)")
+    public func userContentController(_ userContentController: WKUserContentController,
+                                      didReceive message: WKScriptMessage) {
+        guard let windyEventContent: WindyEventContent = decodedJavaScriptObject(any: message.body) else { return }
+
+        switch windyEventContent.name {
+        case .initialize:
+            delegate?.windyMapViewZoomDidInitialize?(self)
+        case .zoomstart:
+            isZooming = true
+            delegate?.windyMapViewZoomDidStart?(self)
+        case .zoomend:
+            isZooming = false
+            delegate?.windyMapViewZoomDidEnd?(self)
+        case .movestart:
+            isMoving = true
+            delegate?.windyMapViewMoveDidStart?(self)
+        case .moveend:
+            isMoving = false
+            delegate?.windyMapViewMoveDidEnd?(self)
+        case .zoom:
+            delegate?.windyMapViewDidZoom?(self)
+        case .move:
+            delegate?.windyMapViewDidMove?(self)
+        }
     }
 
 }
