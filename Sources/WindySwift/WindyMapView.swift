@@ -18,7 +18,6 @@ public class WindyMapView: UIView {
 
     private let webView = FullScreenWKWebView()
     private var didFinishInitialNavigation: Bool = false
-    private var registeredMapIcons: [String: WindyIcon.WindyRepresentation]
 
     // MARK: - Public variables
 
@@ -32,13 +31,16 @@ public class WindyMapView: UIView {
 
     public private(set) var isMoving: Bool = false
 
-    @IBOutlet public weak var delegate: WindyMapViewDelegate?
+    public weak var delegate: WindyMapViewDelegate?
+
+    public var annotations: [WindyMapAnnotation] { annotationViews.map { $0.annotation } }
+
+    private var annotationViews: [WindyMapAnnotationView] = []
 
     // MARK: - Init
 
     public override init(frame: CGRect) {
         self.isWindyLogoVisible = true
-        self.registeredMapIcons = [:]
 
         super.init(frame: frame)
         initialize()
@@ -46,7 +48,6 @@ public class WindyMapView: UIView {
 
     public required init?(coder: NSCoder) {
         self.isWindyLogoVisible = true
-        self.registeredMapIcons = [:]
 
         super.init(coder: coder)
         initialize()
@@ -128,6 +129,7 @@ extension WindyMapView {
         let javascript =
         """
         globalMap.panTo(new L.LatLng(\(coordinate.latitude), \(coordinate.longitude)), \(optionsString));
+        0;
         """
         webView.evaluateJavaScript(javascript)
     }
@@ -137,25 +139,43 @@ extension WindyMapView {
         let javascript =
         """
         globalMap.setZoom(\(zoom), \(optionsString));
+        0;
         """
         webView.evaluateJavaScript(javascript)
     }
 
-    public func addMarker(coordinate: CLLocationCoordinate2D, iconIdentifier: String) {
-        guard let windyIcon = registeredMapIcons[iconIdentifier] else { return }
+    private func addMarker(annotationView: WindyMapAnnotationView) {
+        let coordinate = annotationView.annotation.coordinate
+        let windyIcon = WindyIcon.WindyRepresentation.from(annotationView.icon)
         let windyIconJSON = windyIcon.jsonString() ?? "{}"
+
         let javascript =
         """
         var icon = L.icon(\(windyIconJSON));
-        L.marker([\(coordinate.latitude), \(coordinate.longitude)], {icon: icon}).addTo(globalMap);
+        var marker = L.marker([\(coordinate.latitude), \(coordinate.longitude)], {icon: icon});
+        marker.uuid = "\(annotationView.annotation.uuid.uuidString)";
+        marker.addTo(globalMap);
+        marker.on('click', function(e) {
+            sendNativeMessage('markerclick', {
+                bounds: globalMap.getBounds(),
+                uuid: this.uuid
+            });
+        });
+        markers[marker.uuid] = marker;
+        0;
         """
         webView.evaluateJavaScript(javascript)
     }
 
-    public func addMarker(coordinates: [CLLocationCoordinate2D], iconIdentifier: String) {
-        for coordinate in coordinates {
-            addMarker(coordinate: coordinate, iconIdentifier: iconIdentifier)
+    private func removeMarker(annotationView: WindyMapAnnotationView) {
+        let javascript = """
+        var marker = markers["\(annotationView.annotation.uuid.uuidString)"];
+        if (marker) {
+            globalMap.removeLayer(marker);
         }
+        0;
+        """
+        webView.evaluateJavaScript(javascript)
     }
 
     public func fitBounds(coordinates: [CLLocationCoordinate2D]) {
@@ -164,6 +184,7 @@ extension WindyMapView {
         let javascript = """
         var items = \(jsonStringArray);
         globalMap.fitBounds(items);
+        0;
         """
         webView.evaluateJavaScript(javascript)
     }
@@ -171,8 +192,8 @@ extension WindyMapView {
     public func getCenter(closure: @escaping (CLLocationCoordinate2D?) -> Void) {
         let javascript = """
         globalMap.getCenter();
+        0;
         """
-
         webView.evaluateJavaScript(javascript) { (result, error) in
             guard let windyCoordinate: WindyCoordinates = self.decodedJavaScriptObject(any: result) else {
                 closure(nil)
@@ -185,11 +206,39 @@ extension WindyMapView {
 
 }
 
+// MARK: - Annotations
+
 extension WindyMapView {
 
-    public func registerMapIcon(_ icon: WindyIcon, for identifier: String) {
-        let windyRepresentation = WindyIcon.WindyRepresentation.from(icon)
-        registeredMapIcons[identifier] = windyRepresentation
+    public func addAnnotation(_ annotation: WindyMapAnnotation) {
+        addAnnotations([annotation])
+    }
+
+    public func addAnnotations(_ annotations: [WindyMapAnnotation]) {
+        for annotation in annotations {
+            guard !self.annotations.contains(annotation) else { continue }
+            guard let annotationView = delegate?.windyMapView(self, viewFor: annotation) else { continue }
+            self.annotationViews.append(annotationView)
+            addMarker(annotationView: annotationView)
+        }
+    }
+
+    public func removeAnnotation(_ annotation: WindyMapAnnotation) {
+        removeAnnotations([annotation])
+    }
+
+    public func removeAnnotations(_ annotations: [WindyMapAnnotation]) {
+        for annotation in annotations {
+            guard let annotationView = self.annotationViews.first(where: { $0.annotation == annotation }) else {
+                continue
+            }
+            removeMarker(annotationView: annotationView)
+        }
+    }
+
+    private func handleMarkerClick(uuid: UUID) {
+        guard let annotationView = annotationViews.first(where: { $0.annotation.uuid == uuid }) else { return }
+        print("click annotation: \(annotationView)")
     }
 
 }
@@ -214,23 +263,26 @@ extension WindyMapView: WKScriptMessageHandler {
 
         switch windyEventContent.name {
         case .initialize:
-            delegate?.windyMapViewZoomDidInitialize?(self)
+            delegate?.windyMapViewZoomDidInitialize(self)
         case .zoomstart:
             isZooming = true
-            delegate?.windyMapViewZoomDidStart?(self)
+            delegate?.windyMapViewZoomDidStart(self)
         case .zoomend:
             isZooming = false
-            delegate?.windyMapViewZoomDidEnd?(self)
+            delegate?.windyMapViewZoomDidEnd(self)
         case .movestart:
             isMoving = true
-            delegate?.windyMapViewMoveDidStart?(self)
+            delegate?.windyMapViewMoveDidStart(self)
         case .moveend:
             isMoving = false
-            delegate?.windyMapViewMoveDidEnd?(self)
+            delegate?.windyMapViewMoveDidEnd(self)
         case .zoom:
-            delegate?.windyMapViewDidZoom?(self)
+            delegate?.windyMapViewDidZoom(self)
         case .move:
-            delegate?.windyMapViewDidMove?(self)
+            delegate?.windyMapViewDidMove(self)
+        case .markerclick:
+            guard let uuid = windyEventContent.options.uuid else { return }
+            handleMarkerClick(uuid: uuid)
         }
     }
 

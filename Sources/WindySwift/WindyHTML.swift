@@ -49,18 +49,23 @@ internal struct WindyEventContent: Codable {
     enum EventName: String, Codable {
 
         case initialize
+
         case zoomstart
         case zoomend
         case movestart
         case moveend
+
         case zoom
         case move
+
+        case markerclick
 
     }
 
     struct Options: Codable {
 
         let bounds: Bounds
+        let uuid: UUID?
 
         struct Bounds: Codable {
 
@@ -123,6 +128,7 @@ internal struct WindyHTML {
                     const options = JSON.parse('\(optionsJSONString)');
 
                     var globalMap;
+                    var markers = {};
 
                     function sendNativeMessage(name, options = {}) {
                         var obj = {

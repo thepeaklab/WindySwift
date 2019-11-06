@@ -10,17 +10,39 @@
 import Foundation
 
 
-@objc public protocol WindyMapViewDelegate: class {
+public protocol WindyMapViewDelegate: class {
 
-    @objc optional func windyMapViewZoomDidInitialize(_ windyMapView: WindyMapView)
+    func windyMapViewZoomDidInitialize(_ windyMapView: WindyMapView)
 
-    @objc optional func windyMapViewZoomDidStart(_ windyMapView: WindyMapView)
-    @objc optional func windyMapViewZoomDidEnd(_ windyMapView: WindyMapView)
+    func windyMapViewZoomDidStart(_ windyMapView: WindyMapView)
+    func windyMapViewZoomDidEnd(_ windyMapView: WindyMapView)
 
-    @objc optional func windyMapViewMoveDidStart(_ windyMapView: WindyMapView)
-    @objc optional func windyMapViewMoveDidEnd(_ windyMapView: WindyMapView)
+    func windyMapViewMoveDidStart(_ windyMapView: WindyMapView)
+    func windyMapViewMoveDidEnd(_ windyMapView: WindyMapView)
 
-    @objc optional func windyMapViewDidZoom(_ windyMapView: WindyMapView)
-    @objc optional func windyMapViewDidMove(_ windyMapView: WindyMapView)
+    func windyMapViewDidZoom(_ windyMapView: WindyMapView)
+    func windyMapViewDidMove(_ windyMapView: WindyMapView)
+
+    func windyMapView(_ windyMapView: WindyMapView, viewFor: WindyMapAnnotation) -> WindyMapAnnotationView?
+
+}
+
+
+public extension WindyMapViewDelegate {
+
+    func windyMapViewZoomDidInitialize(_ windyMapView: WindyMapView) { }
+
+    func windyMapViewZoomDidStart(_ windyMapView: WindyMapView) { }
+    func windyMapViewZoomDidEnd(_ windyMapView: WindyMapView) { }
+
+    func windyMapViewMoveDidStart(_ windyMapView: WindyMapView) { }
+    func windyMapViewMoveDidEnd(_ windyMapView: WindyMapView) { }
+
+    func windyMapViewDidZoom(_ windyMapView: WindyMapView) { }
+    func windyMapViewDidMove(_ windyMapView: WindyMapView) { }
+
+    func windyMapView(_ windyMapView: WindyMapView, viewFor: WindyMapAnnotation) -> WindyMapAnnotationView? {
+        return nil
+    }
 
 }
