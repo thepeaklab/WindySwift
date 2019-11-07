@@ -120,6 +120,10 @@ public struct WindyZoomPanOptions: Codable {
         self.noMoveStart = noMoveStart
     }
 
+    public static func animate(_ animate: Bool) -> WindyZoomPanOptions {
+        return WindyZoomPanOptions(animate: animate)
+    }
+
 }
 
 extension WindyMapView {
@@ -192,7 +196,6 @@ extension WindyMapView {
     public func getCenter(closure: @escaping (CLLocationCoordinate2D?) -> Void) {
         let javascript = """
         globalMap.getCenter();
-        0;
         """
         webView.evaluateJavaScript(javascript) { (result, error) in
             guard let windyCoordinate: WindyCoordinates = self.decodedJavaScriptObject(any: result) else {
@@ -238,7 +241,28 @@ extension WindyMapView {
 
     private func handleMarkerClick(uuid: UUID) {
         guard let annotationView = annotationViews.first(where: { $0.annotation.uuid == uuid }) else { return }
-        print("click annotation: \(annotationView)")
+        delegate?.windyMapView(self, didSelect: annotationView)
+    }
+
+    /// Converts annotation to center point
+    public func convert(_ annotation: WindyMapAnnotation, closure: @escaping (CGPoint?) -> Void) {
+        guard annotations.contains(annotation) else {
+            closure(nil)
+            return
+        }
+
+        let javascript = """
+        var marker = markers["\(annotation.uuid.uuidString)"];
+        if (marker) {
+            globalMap.latLngToContainerPoint(marker.getLatLng());
+        } else {
+            0;
+        }
+        """
+
+        webView.evaluateJavaScript(javascript) { (result, error) in
+            closure((self.decodedJavaScriptObject(any: result) as WindyPoint?)?.point())
+        }
     }
 
 }

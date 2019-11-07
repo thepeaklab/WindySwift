@@ -25,6 +25,8 @@ public protocol WindyMapViewDelegate: class {
 
     func windyMapView(_ windyMapView: WindyMapView, viewFor: WindyMapAnnotation) -> WindyMapAnnotationView?
 
+    func windyMapView(_ windyMapView: WindyMapView, didSelect annotationView: WindyMapAnnotationView)
+
 }
 
 
@@ -44,5 +46,7 @@ public extension WindyMapViewDelegate {
     func windyMapView(_ windyMapView: WindyMapView, viewFor: WindyMapAnnotation) -> WindyMapAnnotationView? {
         return nil
     }
+
+    func windyMapView(_ windyMapView: WindyMapView, didSelect annotationView: WindyMapAnnotationView) { }
 
 }

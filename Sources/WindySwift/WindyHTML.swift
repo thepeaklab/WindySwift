@@ -8,7 +8,10 @@
 
 
 import Foundation
+import CoreGraphics
 
+
+// MARK: - WindyInitOptions
 
 public struct WindyInitOptions: Codable {
 
@@ -32,6 +35,7 @@ public struct WindyInitOptions: Codable {
 
 }
 
+// MARK: - WindyCoordinates
 
 internal struct WindyCoordinates: Codable {
 
@@ -40,11 +44,14 @@ internal struct WindyCoordinates: Codable {
 
 }
 
+// MARK: - WindyEventContent
 
 internal struct WindyEventContent: Codable {
 
     let name: EventName
     let options: Options
+
+    // MARK: EventName
 
     enum EventName: String, Codable {
 
@@ -61,6 +68,8 @@ internal struct WindyEventContent: Codable {
         case markerclick
 
     }
+
+    // MARK: Options
 
     struct Options: Codable {
 
@@ -90,6 +99,20 @@ internal struct WindyEventContent: Codable {
 
 }
 
+// MARK: - Windy Point
+
+internal struct WindyPoint: Codable {
+
+    let x: Double
+    let y: Double
+
+    func point() -> CGPoint {
+        return CGPoint(x: x, y: y)
+    }
+
+}
+
+// MARK: - Index HTML
 
 internal struct WindyHTML {
 
