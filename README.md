@@ -58,7 +58,7 @@ mapView.setZoom(zoom: zoomLevel, options: .animate(true))
 
 #### Fit Bounds
 
-Fit the the map, to that a list of coordinates are visible.
+Fit the map, to that a list of coordinates are visible.
 
 ```swift
 let coordinates = [
