@@ -148,6 +148,24 @@ extension WindyMapView {
         webView.evaluateJavaScript(javascript)
     }
 
+    public func setMinZoom(minZoom: Int) {
+        let javascript =
+        """
+        globalMap.setMinZoom(\(minZoom));
+        0;
+        """
+        webView.evaluateJavaScript(javascript)
+    }
+
+    public func setMaxZoom(maxZoom: Int) {
+        let javascript =
+        """
+        globalMap.setMaxZoom(\(maxZoom));
+        0;
+        """
+        webView.evaluateJavaScript(javascript)
+    }
+
     private func addMarker(annotationView: WindyMapAnnotationView) {
         let coordinate = annotationView.annotation.coordinate
         let windyIcon = WindyIcon.WindyRepresentation.from(annotationView.icon)
