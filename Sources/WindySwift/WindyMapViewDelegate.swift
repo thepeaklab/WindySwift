@@ -23,7 +23,7 @@ public protocol WindyMapViewDelegate: class {
     func windyMapViewDidZoom(_ windyMapView: WindyMapView)
     func windyMapViewDidMove(_ windyMapView: WindyMapView)
 
-    func windyMapView(_ windyMapView: WindyMapView, viewFor: WindyMapAnnotation) -> WindyMapAnnotationView?
+    func windyMapView(_ windyMapView: WindyMapView, viewFor annotation: WindyMapAnnotation) -> WindyMapAnnotationView?
 
     func windyMapView(_ windyMapView: WindyMapView, didSelect annotationView: WindyMapAnnotationView)
 

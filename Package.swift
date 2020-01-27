@@ -4,7 +4,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "WindySwift",
+    name: "windy-swift",
     platforms: [
         .macOS(.v10_10),
         .iOS(.v9)

@@ -207,6 +207,15 @@ extension WindyMapView {
         }
     }
 
+    public func getZoom(closure: @escaping (Int?) -> Void) {
+        let javascript = """
+        globalMap.getZoom();
+        """
+        webView.evaluateJavaScript(javascript) { (result, error) in
+            closure(result as? Int)
+        }
+    }
+
 }
 
 // MARK: - Annotations
