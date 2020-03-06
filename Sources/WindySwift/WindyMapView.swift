@@ -259,10 +259,11 @@ extension WindyMapView {
 
     public func removeAnnotations(_ annotations: [WindyMapAnnotation]) {
         for annotation in annotations {
-            guard let annotationView = self.annotationViews.first(where: { $0.annotation == annotation }) else {
+            guard let annotationViewIndex = self.annotationViews.firstIndex(where: { $0.annotation == annotation }) else {
                 continue
             }
-            removeMarker(annotationView: annotationView)
+            removeMarker(annotationView: self.annotationViews[annotationViewIndex])
+            self.annotationViews.remove(at: annotationViewIndex)
         }
     }
 
