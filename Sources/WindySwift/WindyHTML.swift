@@ -153,6 +153,26 @@ internal struct WindyHTML {
                     var globalMap;
                     var markers = {};
 
+                    var streetMapPane = globalMap.createPane('streetMap');
+                    streetMapPane.style.zIndex = 'auto';
+
+                    var topLayer = L.tileLayer('https://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: 'Map Data &copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>',
+                        pane: 'streetMap'
+                    }).addTo(map);
+                    topLayer.setOpacity('0');
+
+                    map.options.minZoom = 4;
+                    map.options.maxZoom = 18;
+
+                    map.on('zoomend', function() {
+                        if (map.getZoom() >= 11) {
+                            topLayer.setOpacity('1');
+                        } else {
+                            topLayer.setOpacity('0');
+                        }
+                    });
+
                     function sendNativeMessage(name, options = {}) {
                         var obj = {
                             name: name,
