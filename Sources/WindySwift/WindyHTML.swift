@@ -172,11 +172,10 @@ internal struct WindyHTML {
                         var topLayer = L.tileLayer('https://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                             attribution: 'Map Data &copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>',
                             pane: 'streetMap'
+                            minZoom: 11,
+                            maxZoom: 20,
                         }).addTo(map);
                         topLayer.setOpacity('0');
-
-                        map.options.minZoom = 4;
-                        map.options.maxZoom = 18;
 
                         map.on('zoomend', function() {
                             if (map.getZoom() >= 11) {
