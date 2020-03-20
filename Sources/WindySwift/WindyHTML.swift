@@ -177,6 +177,9 @@ internal struct WindyHTML {
                         }).addTo(map);
                         topLayer.setOpacity('0');
 
+                        map.options.minZoom = 4;
+                        map.options.maxZoom = 18;
+
                         map.on('zoomend', function() {
                             if (map.getZoom() >= 11) {
                                 topLayer.setOpacity('1');
