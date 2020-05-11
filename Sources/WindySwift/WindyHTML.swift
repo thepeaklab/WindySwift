@@ -170,7 +170,6 @@ internal struct WindyHTML {
                         streetMapPane.style.zIndex = 'auto';
 
                         var topLayer = L.tileLayer('https://b.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                            attribution: 'Map Data &copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>',
                             pane: 'streetMap',
                             minZoom: 11,
                             maxZoom: 20,
