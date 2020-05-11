@@ -77,6 +77,7 @@ public class WindyMapView: UIView {
 
     private func addCopyrightView() {
         copyrightView.translatesAutoresizingMaskIntoConstraints = false
+        copyrightView.isHidden = true
         addSubview(copyrightView)
 
         if #available(iOS 11.0, *) {
