@@ -71,9 +71,13 @@ public class WindyMapView: UIView {
             bottomAnchor.constraint(equalTo: webView.bottomAnchor)
         ])
 
+        addCopyrightView()
+        updateCopyrightViewVisibility()
+    }
+
+    private func addCopyrightView() {
         copyrightView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(copyrightView)
-        updateCopyrightViewVisibility()
 
         if #available(iOS 11.0, *) {
             NSLayoutConstraint.activate([
