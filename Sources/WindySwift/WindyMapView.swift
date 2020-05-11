@@ -37,6 +37,8 @@ public class WindyMapView: UIView {
 
     private var annotationViews: [WindyMapAnnotationView] = []
 
+    private let copyrightView = CopyrightView()
+
     // MARK: - Init
 
     public override init(frame: CGRect) {
@@ -68,6 +70,26 @@ public class WindyMapView: UIView {
             rightAnchor.constraint(equalTo: webView.rightAnchor),
             bottomAnchor.constraint(equalTo: webView.bottomAnchor)
         ])
+
+        addCopyrightView()
+        updateCopyrightViewVisibility()
+    }
+
+    private func addCopyrightView() {
+        copyrightView.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(copyrightView)
+
+        if #available(iOS 11.0, *) {
+            NSLayoutConstraint.activate([
+                safeAreaLayoutGuide.rightAnchor.constraint(equalTo: copyrightView.rightAnchor),
+                safeAreaLayoutGuide.bottomAnchor.constraint(equalTo: copyrightView.bottomAnchor)
+            ])
+        } else {
+            NSLayoutConstraint.activate([
+                rightAnchor.constraint(equalTo: copyrightView.rightAnchor),
+                bottomAnchor.constraint(equalTo: copyrightView.bottomAnchor)
+            ])
+        }
     }
 
     public func initialize(apiKey: String) {
@@ -93,6 +115,16 @@ public class WindyMapView: UIView {
         bodyElement.classList.\(addOrRemove)("windy-logo-invisible");
         """
         webView.evaluateJavaScript(javascript)
+    }
+
+    private func updateCopyrightViewVisibility() {
+        getZoom { zoom in
+            guard let zoom = zoom else {
+                self.copyrightView.isHidden = true
+                return
+            }
+            self.copyrightView.isHidden = zoom <= 11
+        }
     }
 
     private func decodedJavaScriptObject<T: Codable>(any: Any?) -> T? {
@@ -322,6 +354,7 @@ extension WindyMapView: WKScriptMessageHandler {
         case .zoomend:
             isZooming = false
             delegate?.windyMapViewZoomDidEnd(self)
+            updateCopyrightViewVisibility()
         case .movestart:
             isMoving = true
             delegate?.windyMapViewMoveDidStart(self)
