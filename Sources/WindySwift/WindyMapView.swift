@@ -113,7 +113,7 @@ public class WindyMapView: UIView {
         let javascript =
         """
         var bodyElement = document.querySelector("body");
-        bodyElement.classList.\(addOrRemove)("windy-logo-invisible");
+        bodyElement.classList.\(addOrRemove)("windy-logo-lesser-opacity");
         """
         webView.evaluateJavaScript(javascript)
     }

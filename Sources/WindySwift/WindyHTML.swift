@@ -137,8 +137,8 @@ internal struct WindyHTML {
                         height: 100%;
                         width: 100vw;
                     }
-                    html body.windy-logo-invisible a#logo {
-                        display: none !important;
+                    html body.windy-logo-lesser-opacity a#logo {
+                        opacity: 0.8;
                     }
                     div#mobile-ovr-select, div#embed-zoom, div#bottom, div#windy-app-promo {
                         display: none !important;
