@@ -347,7 +347,11 @@ extension WindyMapView: WKNavigationDelegate {
             } else {
                 UIApplication.shared.openURL(url)
             }
+
+            decisionHandler(.cancel)
         }
+
+        decisionHandler(.allow)
     }
 
 }
