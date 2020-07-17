@@ -342,7 +342,11 @@ extension WindyMapView: WKNavigationDelegate {
             let url = navigationAction.request.url,
             UIApplication.shared.canOpenURL(url)
         {
-            UIApplication.shared.open(url)
+            if #available(iOS 10.0, *) {
+                UIApplication.shared.open(url)
+            } else {
+                UIApplication.shared.openURL(url)
+            }
         }
     }
 
