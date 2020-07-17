@@ -340,7 +340,7 @@ extension WindyMapView: WKNavigationDelegate {
     public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
         if navigationAction.navigationType == .linkActivated,
             let url = navigationAction.request.url,
-            let UIApplication.shared.canOpenURL(url)
+            UIApplication.shared.canOpenURL(url)
         {
             UIApplication.shared.open(url)
         }
