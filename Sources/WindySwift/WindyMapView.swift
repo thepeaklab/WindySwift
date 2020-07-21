@@ -346,11 +346,9 @@ extension WindyMapView: WKNavigationDelegate {
             }
 
             decisionHandler(.cancel)
-            return
+        } else {
+            decisionHandler(.allow)
         }
-
-        decisionHandler(.allow)
-        return
     }
 
 }
