@@ -102,13 +102,13 @@ public class WindyMapView: UIView {
 
         if #available(iOS 11.0, *) {
             NSLayoutConstraint.activate([
-                safeAreaLayoutGuide.leftAnchor.constraint(equalTo: copyrightView.leftAnchor),
-                safeAreaLayoutGuide.bottomAnchor.constraint(equalTo: copyrightView.bottomAnchor)
+                safeAreaLayoutGuide.leftAnchor.constraint(equalTo: sourceView.leftAnchor),
+                safeAreaLayoutGuide.bottomAnchor.constraint(equalTo: sourceView.bottomAnchor)
             ])
         } else {
             NSLayoutConstraint.activate([
-                leftAnchor.constraint(equalTo: copyrightView.leftAnchor),
-                bottomAnchor.constraint(equalTo: copyrightView.bottomAnchor)
+                leftAnchor.constraint(equalTo: sourceView.leftAnchor),
+                bottomAnchor.constraint(equalTo: sourceView.bottomAnchor)
             ])
         }
     }
