@@ -39,6 +39,8 @@ public class WindyMapView: UIView {
 
     private let copyrightView = CopyrightView()
 
+    private let sourceView = SourceView()
+
     // MARK: - Init
 
     public override init(frame: CGRect) {
@@ -72,6 +74,7 @@ public class WindyMapView: UIView {
         ])
 
         addCopyrightView()
+        addSourceView()
         updateCopyrightViewVisibility()
     }
 
@@ -89,6 +92,23 @@ public class WindyMapView: UIView {
             NSLayoutConstraint.activate([
                 rightAnchor.constraint(equalTo: copyrightView.rightAnchor),
                 bottomAnchor.constraint(equalTo: copyrightView.bottomAnchor)
+            ])
+        }
+    }
+
+    private func addSourceView() {
+        sourceView.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(sourceView)
+
+        if #available(iOS 11.0, *) {
+            NSLayoutConstraint.activate([
+                safeAreaLayoutGuide.leftAnchor.constraint(equalTo: sourceView.leftAnchor),
+                safeAreaLayoutGuide.bottomAnchor.constraint(equalTo: sourceView.bottomAnchor)
+            ])
+        } else {
+            NSLayoutConstraint.activate([
+                leftAnchor.constraint(equalTo: sourceView.leftAnchor),
+                bottomAnchor.constraint(equalTo: sourceView.bottomAnchor)
             ])
         }
     }
@@ -113,7 +133,7 @@ public class WindyMapView: UIView {
         let javascript =
         """
         var bodyElement = document.querySelector("body");
-        bodyElement.classList.\(addOrRemove)("windy-logo-lesser-opacity");
+        bodyElement.classList.\(addOrRemove)("windy-logo-invisible");
         """
         webView.evaluateJavaScript(javascript)
     }
