@@ -39,8 +39,8 @@ class SourceView: UIView {
         addSubview(stackView)
 
         NSLayoutConstraint.activate([
-            stackView.leftAnchor.constraint(equalTo: leftAnchor),
-            stackView.rightAnchor.constraint(equalTo: rightAnchor),
+            stackView.leftAnchor.constraint(equalTo: leftAnchor, constant: 5),
+            stackView.rightAnchor.constraint(equalTo: rightAnchor, constant: -5),
             stackView.bottomAnchor.constraint(equalTo: bottomAnchor),
             stackView.topAnchor.constraint(equalTo: topAnchor)
         ])
