@@ -14,7 +14,7 @@ let package = Package(
     ],
     dependencies: [],
     targets: [
-        .target(name: "WindySwift", dependencies: []),
+        .target(name: "WindySwift", dependencies: [], exclude: ["WindySwiftExample"]),
         .testTarget(name: "WindySwiftTests", dependencies: ["WindySwift"]),
     ]
 )
